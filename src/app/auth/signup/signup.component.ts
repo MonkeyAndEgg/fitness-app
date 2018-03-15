@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ERROR_HINT_MESSAGES } from '../../message/error-hint-message';
+import { GENERAL_MESSAGES } from '../../message/general-messages';
 
 @Component({
   selector: 'app-signup',
@@ -8,6 +10,9 @@ import { NgForm } from '@angular/forms';
 })
 export class SignupComponent implements OnInit {
   maxDate;
+
+  ERROR_HINT_MESSAGES = ERROR_HINT_MESSAGES;
+  GENERAL_MESSAGES = GENERAL_MESSAGES;
 
   constructor() { }
 

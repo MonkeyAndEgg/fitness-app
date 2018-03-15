@@ -16,10 +16,10 @@
         required
         #emailInput="ngModel">
       <mat-error *ngIf="!emailInput.hasError('required')">
-        Invalid E-Mail address.
+        {{ERROR_HINT_MESSAGES.INVALID_EMAIL}}
       </mat-error>
       <mat-error *ngIf="emailInput.hasError('required')">
-        E-Mail cannot be empty.
+        {{ERROR_HINT_MESSAGES.EMPTY_EMAIL}}
       </mat-error>
     </mat-form-field>
 
@@ -37,7 +37,7 @@
         {{passwordDigits?.value?.length}} / 6
       </mat-hint>
       <mat-error>
-        Password should be at least 6 characters.
+        {{ERROR_HINT_MESSAGES.LENGTH_PASSWORD}}
       </mat-error>
     </mat-form-field>
 
@@ -60,7 +60,7 @@
     </mat-form-field>
 
     <mat-checkbox required color="primary" ngModel name="checkbox">
-        Agree To Terms and Conditions.
+        {{GENERAL_MESSAGES.TERMS_AND_CONDITIONS}}
     </mat-checkbox>
 
     <button type="submit" mat-raised-button color="primary" [disabled]="signUpForm.invalid">
