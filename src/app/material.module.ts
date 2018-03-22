@@ -7,6 +7,7 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
+  MatListModule,
   MatNativeDateModule,
   MatSidenavModule,
   MatToolbarModule
@@ -21,7 +22,8 @@ import {
     MatNativeDateModule,
     MatCheckboxModule,
     MatSidenavModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatListModule
   ],
   exports: [ MatButtonModule,
     MatIconModule,
@@ -31,7 +33,8 @@ import {
     MatNativeDateModule,
     MatCheckboxModule,
     MatSidenavModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatListModule
   ]
 })
 
