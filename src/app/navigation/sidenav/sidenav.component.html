@@ -1,0 +1,20 @@
+<mat-nav-list (click)="toggleSideNav()">
+  <a mat-list-item routerLink="/signup">
+    <mat-icon>face</mat-icon>
+    <span class="nav-label">Signup</span>
+  </a>
+  <a mat-list-item routerLink="/login">
+    <mat-icon>input</mat-icon>
+    <span class="nav-label">Login</span>
+  </a>
+  <a mat-list-item routerLink="/training">
+    <mat-icon>timer</mat-icon>
+    <span class="nav-label">Training</span>
+  </a>
+  <mat-list-item>
+    <button mat-icon-button>
+      <mat-icon>eject</mat-icon>
+      <span class="nav-label">Logout</span>
+    </button>
+  </mat-list-item>
+</mat-nav-list>
