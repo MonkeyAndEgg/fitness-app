@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ERROR_HINT_MESSAGES } from '../../message/error-hint-message';
 import { GENERAL_MESSAGES } from '../../message/general-messages';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -15,7 +16,7 @@ export class SignupComponent implements OnInit {
   ERROR_HINT_MESSAGES = ERROR_HINT_MESSAGES;
   GENERAL_MESSAGES = GENERAL_MESSAGES;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.maxDate = new Date();
@@ -37,6 +38,9 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.signupForm);
+    this.authService.registerUser({
+      email: this.signupForm.value.email,
+      password: this.signupForm.value.password
+    });
   }
 }
