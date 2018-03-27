@@ -1,6 +1,7 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { CancelTrainingComponent } from './cencel-training/cancel-training.component';
+import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-progress-training',
@@ -8,13 +9,11 @@ import { CancelTrainingComponent } from './cencel-training/cancel-training.compo
   styleUrls: ['./progress-training.component.css']
 })
 export class ProgressTrainingComponent implements OnInit {
-  @Output()
-  exitTraining = new EventEmitter<void>();
-
   progress = 0;
   timer: any;
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog,
+              private trainingService: TrainingService) { }
 
   ngOnInit() {
     this.enableTimer();
@@ -31,7 +30,7 @@ export class ProgressTrainingComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.exitTraining.emit();
+        this.trainingService.cancelTraining(this.progress);
       } else {
         this.enableTimer();
       }
@@ -39,12 +38,14 @@ export class ProgressTrainingComponent implements OnInit {
   }
 
   enableTimer() {
+    const step = this.trainingService.getSelectedExercise().duration / 100 * 1000;
     this.timer = setInterval(() => {
-      this.progress = this.progress + 10;
+      this.progress = this.progress + 1;
       if (this.progress >= 100) {
+        this.trainingService.completeTraining();
         clearInterval(this.timer);
       }
-    }, 1000);
+    }, step);
   }
 
 }
