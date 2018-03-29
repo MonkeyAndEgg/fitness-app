@@ -45,4 +45,8 @@ export class TrainingService {
     this.selectedExercise = null;
     this.activeExercise.next(null);
   }
+
+  getPastExercises() {
+    return this.exercises.slice();
+  }
 }
