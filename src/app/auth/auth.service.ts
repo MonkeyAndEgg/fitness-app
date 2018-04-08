@@ -1,12 +1,12 @@
-import { User } from './user.model';
 import { AuthData } from './auth-data.model';
 import { Subject } from 'rxjs/Subject';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Injectable()
 export class AuthService {
-  private user: User;
+  private authenticated = false;
   readonly ROUTING_PAGE = {
     TRAINING: '/training',
     LOGIN: '/login'
@@ -14,41 +14,38 @@ export class AuthService {
 
   authStatus = new Subject<boolean>();
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private angularFireAuth: AngularFireAuth) {}
 
   registerUser(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
-    };
-
-    this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, true);
+    this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password).then(result => {
+      this.authenticated = true;
+      this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, true);
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
   login(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
-    };
-
-    this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, true);
+    this.angularFireAuth.auth.signInWithEmailAndPassword(
+      authData.email,
+      authData.password
+    ).then(result => {
+      this.authenticated = true;
+      this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, true);
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
   logout() {
-    this.user = undefined;
+    this.authenticated = false;
 
     this.onChangeAuthStatus(this.ROUTING_PAGE.LOGIN, false);
   }
 
-  getUser() {
-    // given this.user is private, return this.user directly will simply
-    // get people to access the private object, so use {...} to return
-    // brand new object to avoid the access
-    return { ...this.user };
-  }
-
   isAuth() {
-    return this.user !== undefined;
+    return this.authenticated;
   }
 
   private onChangeAuthStatus(routingPage: string, status: boolean) {
