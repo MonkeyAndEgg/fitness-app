@@ -1,24 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ERROR_HINT_MESSAGES } from '../../message/error-hint-message';
 import { GENERAL_MESSAGES } from '../../message/general-messages';
 import { AuthService } from '../auth.service';
+import { UIService } from '../../common/ui.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, OnDestroy {
+  private loadingSubs: Subscription;
   maxDate;
   signupForm: FormGroup;
+
+  isLoading = false;
 
   ERROR_HINT_MESSAGES = ERROR_HINT_MESSAGES;
   GENERAL_MESSAGES = GENERAL_MESSAGES;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService,
+              private uiService: UIService) { }
 
   ngOnInit() {
+    this.uiService.loadingState.subscribe(state => {
+      this.isLoading = state;
+    });
     this.maxDate = new Date();
     this.maxDate.setFullYear(2015);
     this.signupForm = new FormGroup({
@@ -35,6 +44,10 @@ export class SignupComponent implements OnInit {
         validators: [Validators.required]
       })
     });
+  }
+
+  ngOnDestroy() {
+    this.uiService.loadingState.unsubscribe();
   }
 
   onSubmit() {

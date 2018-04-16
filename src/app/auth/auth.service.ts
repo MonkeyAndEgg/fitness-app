@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { TrainingService } from '../training/training.service';
 import { MatSnackBar } from '@angular/material';
+import { UIService } from '../common/ui.service';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,8 @@ export class AuthService {
   constructor(private router: Router,
               private angularFireAuth: AngularFireAuth,
               private trainingService: TrainingService,
-              private snackBarSerivce: MatSnackBar) {}
+              private snackBarSerivce: MatSnackBar,
+              private uiService: UIService) {}
 
   initAuthStateListener() {
     this.angularFireAuth.authState.subscribe(user => {
@@ -35,9 +37,13 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
-    this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password).then(result => {
+    this.uiService.loadingState.next(true);
 
+    this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password).then(result => {
+      this.uiService.loadingState.next(false);
     }).catch(error => {
+      this.uiService.loadingState.next(false);
+
       this.snackBarSerivce.open(error.message, null, {
         duration: 3000
       });
@@ -45,12 +51,16 @@ export class AuthService {
   }
 
   login(authData: AuthData) {
+    this.uiService.loadingState.next(true);
+
     this.angularFireAuth.auth.signInWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(result => {
-      console.log(result);
+      this.uiService.loadingState.next(false);
     }).catch(error => {
+      this.uiService.loadingState.next(false);
+
       this.snackBarSerivce.open(error.message, null, {
         duration: 3000
       });
