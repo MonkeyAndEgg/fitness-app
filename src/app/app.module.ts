@@ -25,6 +25,7 @@ import { environment } from '../environments/environment';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { UIService } from './common/ui.service';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { UIService } from './common/ui.service';
     HomepageComponent,
     HeaderComponent,
     SidenavComponent,
-    CancelTrainingComponent
+    CancelTrainingComponent,
+    SpinnerComponent
   ],
   imports: [
     BrowserModule,
