@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { TrainingService } from '../training/training.service';
-import { MatSnackBar } from '@angular/material';
 import { UIService } from '../common/ui.service';
 
 @Injectable()
@@ -20,7 +19,6 @@ export class AuthService {
   constructor(private router: Router,
               private angularFireAuth: AngularFireAuth,
               private trainingService: TrainingService,
-              private snackBarSerivce: MatSnackBar,
               private uiService: UIService) {}
 
   initAuthStateListener() {
@@ -44,9 +42,7 @@ export class AuthService {
     }).catch(error => {
       this.uiService.loadingState.next(false);
 
-      this.snackBarSerivce.open(error.message, null, {
-        duration: 3000
-      });
+      this.uiService.showSnackBar(error.message, null, 3000);
     });
   }
 
@@ -61,9 +57,7 @@ export class AuthService {
     }).catch(error => {
       this.uiService.loadingState.next(false);
 
-      this.snackBarSerivce.open(error.message, null, {
-        duration: 3000
-      });
+      this.uiService.showSnackBar(error.message, null, 3000);
     });
   }
 
