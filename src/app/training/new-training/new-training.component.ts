@@ -3,6 +3,7 @@ import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
+import { UIService } from '../../common/ui.service';
 
 @Component({
   selector: 'app-new-training',
@@ -13,10 +14,18 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   newTrainingForm: FormGroup;
   exercises: Exercise[];
   exerciseSubscription: Subscription;
+  loadingSubs: Subscription;
 
-  constructor(private trainingService: TrainingService) { }
+  isLoading = false;
+
+  constructor(private trainingService: TrainingService,
+              private uiService: UIService) { }
 
   ngOnInit() {
+    this.loadingSubs = this.uiService.loadingState.subscribe(state => {
+      this.isLoading = state;
+    });
+
     this.newTrainingForm = new FormGroup({
       trainingOption: new FormControl('', {
         validators: [ Validators.required ]
@@ -30,6 +39,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.exerciseSubscription.unsubscribe();
+    this.loadingSubs.unsubscribe();
   }
 
   startTraining() {

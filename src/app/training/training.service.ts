@@ -3,6 +3,7 @@ import { Subject } from 'rxjs/Subject';
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Subscription } from 'rxjs/Subscription';
+import { UIService } from '../common/ui.service';
 
 @Injectable()
 export class TrainingService {
@@ -14,9 +15,12 @@ export class TrainingService {
   latestExercises = new Subject<Exercise[]>();
   pastExercises = new Subject<Exercise[]>();
 
-  constructor(private database: AngularFirestore) {}
+  constructor(private database: AngularFirestore,
+              private uiService: UIService) {}
 
   retrieveCurrentExercises() {
+    this.uiService.loadingState.next(true);
+    
     this.firebaseSubscriptions.push(this.database
       .collection('exercises')
       .snapshotChanges()
@@ -33,6 +37,7 @@ export class TrainingService {
       .subscribe((exercises: Exercise[]) => {
         this.currentExercises = exercises;
         this.latestExercises.next([ ...this.currentExercises ]);
+        this.uiService.loadingState.next(false);
       }));
   }
 
