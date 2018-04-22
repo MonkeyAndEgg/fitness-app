@@ -20,7 +20,7 @@ export class TrainingService {
 
   retrieveCurrentExercises() {
     this.uiService.loadingState.next(true);
-    
+
     this.firebaseSubscriptions.push(this.database
       .collection('exercises')
       .snapshotChanges()
@@ -38,6 +38,10 @@ export class TrainingService {
         this.currentExercises = exercises;
         this.latestExercises.next([ ...this.currentExercises ]);
         this.uiService.loadingState.next(false);
+      }, error => {
+      this.uiService.loadingState.next(false);
+        this.uiService.showSnackBar('Fetching exercises failed.', null, 3000);
+        this.latestExercises.next(null);
       }));
   }
 
