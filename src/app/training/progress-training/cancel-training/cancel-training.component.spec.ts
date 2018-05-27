@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CencelTrainingComponent } from './cancel-training.component';
+import { CancelTrainingComponent } from './cancel-training.component';
 
 describe('CencelTrainingComponent', () => {
-  let component: CencelTrainingComponent;
-  let fixture: ComponentFixture<CencelTrainingComponent>;
+  let component: CancelTrainingComponent;
+  let fixture: ComponentFixture<CancelTrainingComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CencelTrainingComponent ]
+      declarations: [ CancelTrainingComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CencelTrainingComponent);
+    fixture = TestBed.createComponent(CancelTrainingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

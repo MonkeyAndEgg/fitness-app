@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { CancelTrainingComponent } from './cencel-training/cancel-training.component';
+import { CancelTrainingComponent } from './cancel-training/cancel-training.component';
 import { TrainingService } from '../training.service';
 
 @Component({
