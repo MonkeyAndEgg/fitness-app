@@ -1,0 +1,55 @@
+<section class="signup-container">
+  <form
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="10px"
+    (ngSubmit)="onSubmit()"
+    [formGroup]="signupForm">
+    <mat-form-field>
+      <input type="email" matInput placeholder="Your email" formControlName="email">
+
+      <mat-error *ngIf="signupForm.controls['email'].invalid && signupForm.controls['email'].dirty">
+        {{ERROR_HINT_MESSAGES.INVALID_EMAIL}}
+      </mat-error>
+      <mat-error *ngIf="!signupForm.controls['email'].dirty">
+        {{ERROR_HINT_MESSAGES.EMPTY_EMAIL}}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field hintLabel="Password mush contain at least 6 characters.">
+      <input type="password" matInput placeholder="Your password" formControlName="password">
+
+      <mat-hint align="end">
+        {{signupForm.controls['password'].value.length}} / 6
+      </mat-hint>
+
+      <mat-error>
+        {{ERROR_HINT_MESSAGES.LENGTH_PASSWORD}}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="datepicker" placeholder="Birth Date" [max]="maxDate" formControlName="birthDate">
+
+      <mat-datepicker-toggle matSuffix [for]="datepicker">
+      </mat-datepicker-toggle>
+
+      <mat-datepicker #datepicker>
+      </mat-datepicker>
+
+      <mat-error>
+        {{ERROR_HINT_MESSAGES.EMPTY_BIRTH_DATE}}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-checkbox required color="primary" formControlName="checkbox">
+        {{GENERAL_MESSAGES.TERMS_AND_CONDITIONS}}
+    </mat-checkbox>
+
+    <button *ngIf="!(isLoading$ | async)" type="submit" mat-raised-button color="primary" [disabled]="signupForm.invalid">
+      Submit
+    </button>
+    <app-spinner [showSpinner]="isLoading$ | async" [diameter]="30"></app-spinner>
+  </form>
+</section>
+
