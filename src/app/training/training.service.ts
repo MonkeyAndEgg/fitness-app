@@ -1,25 +1,24 @@
 import { Exercise } from './exercise.model';
-import { Subject } from 'rxjs/Subject';
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Subscription } from 'rxjs/Subscription';
 import { UIService } from '../common/ui.service';
+import * as UI from '../common/ui.actions';
+import * as fromTraining from './training.reducer';
+import * as Training from './training.actions';
+import { Store } from '@ngrx/store';
+import {take} from 'rxjs/operators';
 
 @Injectable()
 export class TrainingService {
-  private currentExercises: Exercise[] = [];
-  private selectedExercise: Exercise;
   private firebaseSubscriptions: Subscription[] = [];
 
-  activeExercise = new Subject<Exercise>();
-  latestExercises = new Subject<Exercise[]>();
-  pastExercises = new Subject<Exercise[]>();
-
   constructor(private database: AngularFirestore,
-              private uiService: UIService) {}
+              private uiService: UIService,
+              private store: Store<fromTraining.State>) {}
 
   retrieveCurrentExercises() {
-    this.uiService.loadingState.next(true);
+    this.store.dispatch(new UI.StartLoading());
 
     this.firebaseSubscriptions.push(this.database
       .collection('exercises')
@@ -35,52 +34,56 @@ export class TrainingService {
         });
       })
       .subscribe((exercises: Exercise[]) => {
-        this.currentExercises = exercises;
-        this.latestExercises.next([ ...this.currentExercises ]);
-        this.uiService.loadingState.next(false);
+        this.store.dispatch(new UI.StopLoading());
+        this.store.dispatch(new Training.SetAvailableTraining(exercises));
       }, error => {
-      this.uiService.loadingState.next(false);
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackBar('Fetching exercises failed.', null, 3000);
-        this.latestExercises.next(null);
       }));
   }
 
   startExercise(selectedId: string) {
-    this.selectedExercise = this.currentExercises.find(exercise => exercise.id === selectedId);
-    this.activeExercise.next({ ...this.selectedExercise });
-  }
-
-  getSelectedExercise() {
-    return { ...this.selectedExercise };
+    this.store.dispatch(new Training.StartActiveTraining(selectedId));
   }
 
   cancelTraining(progress: number) {
-    this.passDataToDatabase({ ...this.selectedExercise,
-      duration: this.selectedExercise.duration * (progress / 100),
-      calories: this.selectedExercise.calories * (progress / 100),
-      date: new Date(),
-      state: 'cancelled'
+    this.store.select(fromTraining.getActiveExercise)
+      .pipe(take(1))
+      .subscribe(exercise => {
+        this.passDataToDatabase({
+          ...exercise,
+          duration: exercise.duration * (progress / 100),
+          calories: exercise.calories * (progress / 100),
+          date: new Date(),
+          state: 'cancelled'
+        });
+        this.store.dispatch(new Training.StopActiveTraining());
     });
-    this.selectedExercise = null;
-    this.activeExercise.next(null);
   }
 
   completeTraining() {
-    this.passDataToDatabase({ ...this.selectedExercise,
-      date: new Date(),
-      state: 'completed'
+    this.store.select(fromTraining.getActiveExercise)
+      .pipe(take(1))
+      .subscribe(exercise => {
+        if (exercise) {
+          this.passDataToDatabase({
+            ...exercise,
+            date: new Date(),
+            state: 'completed'
+          });
+          this.store.dispatch(new Training.StopActiveTraining());
+        }
     });
-    this.selectedExercise = null;
-    this.activeExercise.next(null);
   }
 
   retrievePastExercises() {
     this.firebaseSubscriptions.push(
-      this.database.collection('finishedExercises')
-      .valueChanges()
-      .subscribe((exercises: Exercise[]) => {
-        this.pastExercises.next(exercises);
-      }));
+      this.database
+        .collection('finishedExercises')
+        .valueChanges()
+        .subscribe((exercises: Exercise[]) => {
+          this.store.dispatch(new Training.SetFinishedTraining(exercises));
+        }));
   }
 
   cancelSubscriptions() {

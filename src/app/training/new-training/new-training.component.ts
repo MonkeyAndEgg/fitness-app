@@ -1,54 +1,41 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs/Subscription';
-import { UIService } from '../../common/ui.service';
+
+import * as fromTraining from '../training.reducer';
+import * as fromRoot from '../../app.reducer';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-new-training',
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css']
 })
-export class NewTrainingComponent implements OnInit, OnDestroy {
+export class NewTrainingComponent implements OnInit {
   newTrainingForm: FormGroup;
-  exercises: Exercise[];
-  exerciseSubscription: Subscription;
-  loadingSubs: Subscription;
+  exercises$: Observable<Exercise[]>;
 
-  isLoading = false;
+  isLoading$: Observable<boolean>;
 
   constructor(private trainingService: TrainingService,
-              private uiService: UIService) { }
+              private store: Store<fromTraining.State>) { }
 
   ngOnInit() {
-    this.loadingSubs = this.uiService.loadingState.subscribe(state => {
-      this.isLoading = state;
-    });
+    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
+    this.exercises$ = this.store.select(fromTraining.getAvailableExercises);
 
     this.newTrainingForm = new FormGroup({
       trainingOption: new FormControl('', {
         validators: [ Validators.required ]
       })
     });
-    this.exerciseSubscription = this.trainingService.latestExercises.subscribe(exercises => {
-      this.exercises = exercises;
-    });
     this.retrieveExercises();
   }
 
   retrieveExercises() {
     this.trainingService.retrieveCurrentExercises();
-  }
-
-  ngOnDestroy() {
-    if (this.exerciseSubscription) {
-      this.exerciseSubscription.unsubscribe();
-    }
-
-    if (this.loadingSubs) {
-      this.loadingSubs.unsubscribe();
-    }
   }
 
   startTraining() {

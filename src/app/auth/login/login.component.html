@@ -16,9 +16,9 @@
       <mat-error>{{ERROR_HINT_MESSAGES.INVALID_PASSWORD}}</mat-error>
     </mat-form-field>
 
-    <button *ngIf="!isLoading" type="submit" color="primary" [disabled]="loginForm.invalid" mat-raised-button>
+    <button *ngIf="!(isLoading$ | async)" type="submit" color="primary" [disabled]="loginForm.invalid" mat-raised-button>
       Submit
     </button>
-    <app-spinner [showSpinner]="isLoading" [diameter]="30"></app-spinner>
+    <app-spinner [showSpinner]="isLoading$ | async" [diameter]="30"></app-spinner>
   </form>
 </section>

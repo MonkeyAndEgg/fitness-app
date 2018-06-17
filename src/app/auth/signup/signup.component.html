@@ -46,10 +46,10 @@
         {{GENERAL_MESSAGES.TERMS_AND_CONDITIONS}}
     </mat-checkbox>
 
-    <button *ngIf="!isLoading" type="submit" mat-raised-button color="primary" [disabled]="signupForm.invalid">
+    <button *ngIf="!(isLoading$ | async)" type="submit" mat-raised-button color="primary" [disabled]="signupForm.invalid">
       Submit
     </button>
-    <app-spinner [showSpinner]="isLoading" [diameter]="30"></app-spinner>
+    <app-spinner [showSpinner]="isLoading$ | async" [diameter]="30"></app-spinner>
   </form>
 </section>
 

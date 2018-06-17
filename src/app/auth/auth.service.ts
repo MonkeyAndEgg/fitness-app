@@ -1,61 +1,60 @@
 import { AuthData } from './auth-data.model';
-import { Subject } from 'rxjs/Subject';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { TrainingService } from '../training/training.service';
 import { UIService } from '../common/ui.service';
+import { Action, Store } from '@ngrx/store';
+import * as fromRoot from '../app.reducer';
+import * as UI from '../common/ui.actions';
+import * as Auth from './auth.actions';
 
 @Injectable()
 export class AuthService {
-  private authenticated = false;
   readonly ROUTING_PAGE = {
     TRAINING: '/training',
     LOGIN: '/login'
   };
 
-  authStatus = new Subject<boolean>();
-
   constructor(private router: Router,
               private angularFireAuth: AngularFireAuth,
               private trainingService: TrainingService,
-              private uiService: UIService) {}
+              private uiService: UIService,
+              private store: Store<fromRoot.State>) {}
 
   initAuthStateListener() {
     this.angularFireAuth.authState.subscribe(user => {
       if (user) {
-        this.authenticated = true;
-        this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, true);
+        this.onChangeAuthStatus(this.ROUTING_PAGE.TRAINING, new Auth.Authenticated());
       } else {
-        this.authenticated = false;
-        this.onChangeAuthStatus(this.ROUTING_PAGE.LOGIN, false);
+        this.onChangeAuthStatus(this.ROUTING_PAGE.LOGIN, new Auth.Unauthenticated());
         this.trainingService.cancelSubscriptions();
       }
     });
   }
 
   registerUser(authData: AuthData) {
-    this.uiService.loadingState.next(true);
+    this.store.dispatch(new UI.StartLoading());
 
     this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password).then(result => {
-      this.uiService.loadingState.next(false);
+      this.store.dispatch(new UI.StopLoading());
     }).catch(error => {
-      this.uiService.loadingState.next(false);
+      this.store.dispatch(new UI.StopLoading());
 
       this.uiService.showSnackBar(error.message, null, 3000);
     });
   }
 
   login(authData: AuthData) {
-    this.uiService.loadingState.next(true);
+    this.store.dispatch(new UI.StartLoading());
 
     this.angularFireAuth.auth.signInWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(result => {
-      this.uiService.loadingState.next(false);
+      this.store.dispatch(new UI.StopLoading());
     }).catch(error => {
-      this.uiService.loadingState.next(false);
+      this.store.dispatch(new UI.StopLoading());
 
       this.uiService.showSnackBar(error.message, null, 3000);
     });
@@ -65,12 +64,8 @@ export class AuthService {
     this.angularFireAuth.auth.signOut();
   }
 
-  isAuth() {
-    return this.authenticated;
-  }
-
-  private onChangeAuthStatus(routingPage: string, status: boolean) {
-    this.authStatus.next(status);
+  private onChangeAuthStatus(routingPage: string, action: Action) {
+    this.store.dispatch(action);
     this.router.navigate([routingPage]);
   }
 }
