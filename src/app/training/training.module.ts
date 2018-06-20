@@ -8,6 +8,7 @@ import { SharedModule } from '../common/shared.module';
 import { TrainingRoutingModule } from './training-routing.module';
 import { StoreModule } from '@ngrx/store';
 import { trainingReducer } from './training.reducer';
+import { EditTrainingComponent } from './edit-training/edit-training.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { trainingReducer } from './training.reducer';
     ProgressTrainingComponent,
     NewTrainingComponent,
     PastTrainingComponent,
-    CancelTrainingComponent
+    CancelTrainingComponent,
+    EditTrainingComponent
   ],
   imports: [
     SharedModule,
